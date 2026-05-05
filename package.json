@@ -1,0 +1,10 @@
+{
+  "name": "ftth-collection",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:constructor": "cd constructor && npm install && npm run build",
+    "build:simulator": "cd simulator && npm install && npm run build",
+    "build": "npm run build:constructor && npm run build:simulator && mkdir -p dist/constructor dist/simulator && cp -r constructor/dist/* dist/constructor/ && cp -r simulator/dist/* dist/simulator/ && cp index.html dist/ && cp style.css dist/ || true"
+  }
+}

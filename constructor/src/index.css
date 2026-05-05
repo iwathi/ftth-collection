@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .glass {
+    @apply bg-white/20 backdrop-blur-md border border-white/30 shadow-lg;
+  }
+  .glass-dark {
+    @apply bg-black/40 backdrop-blur-md border border-white/10 shadow-xl;
+  }
+}
+
+:root {
+  --background: #0f172a; /* slate-900 */
+  --foreground: #f8fafc; /* slate-50 */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; /* Prevent scrolling for the full-screen game */
+}
+
+.react-flow__bg {
+  background-color: transparent !important;
+}
+
+/* エッジ(ケーブル線)を常にノードの前面に表示する
+   インフラノード(zIndex:0) < エッジ(z-index:5) < 通信機器ノード(zIndex:10) */
+.react-flow__edges {
+  z-index: 5 !important;
+}
+
+/* エッジのラベルも前面に */
+.react-flow__edge-labels {
+  z-index: 6 !important;
+}
