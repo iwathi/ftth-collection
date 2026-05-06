@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { fetchRoute, generateInfrastructure, calculateCost, getDistance, searchNTTBuildings } from '../logic/infraLogic';
 import type { SimulationResult, NTTBuilding } from '../logic/infraLogic';
-import { event } from '../lib/gtag';
+import { trackEvent } from '../lib/gtag';
 
 // Leaflet markers
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -90,7 +90,7 @@ export const MapApp: React.FC = () => {
     setLoadingStep('検索中...');
     
     // 分析用イベント送信: 住所検索
-    event({
+    trackEvent({
       action: 'search_jump',
       category: 'interaction',
       label: 'Address Search',
@@ -133,7 +133,7 @@ export const MapApp: React.FC = () => {
     setLoadingStep('局舎を検索中...');
 
     // 分析用イベント送信: 自宅確定
-    event({
+    trackEvent({
       action: 'confirm_home',
       category: 'interaction',
       label: 'Set Home Location',
@@ -174,7 +174,7 @@ export const MapApp: React.FC = () => {
     setLoadingStep('経路を算出中...');
 
     // 分析用イベント送信: 手動局舎確定
-    event({
+    trackEvent({
       action: 'confirm_ntt_manual',
       category: 'interaction',
       label: 'Set NTT Building Manually',
@@ -205,7 +205,7 @@ export const MapApp: React.FC = () => {
       setResult({ ...infra, building, cost });
 
       // 分析用イベント送信: シミュレーション成功
-      event({
+      trackEvent({
         action: 'simulation_success',
         category: 'feature',
         label: building.name,
@@ -217,7 +217,7 @@ export const MapApp: React.FC = () => {
       setJumpCoords(home);
     } catch(err: any) {
       // 分析用イベント送信: シミュレーション失敗
-      event({
+      trackEvent({
         action: 'simulation_error',
         category: 'feature',
         label: err.message,
@@ -229,7 +229,7 @@ export const MapApp: React.FC = () => {
 
   const handleReset = () => {
     // 分析用イベント送信: リセット
-    event({
+    trackEvent({
       action: 'reset_simulator',
       category: 'interaction',
       label: 'Restart Simulation',

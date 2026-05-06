@@ -1,11 +1,11 @@
 import React from 'react';
 import { EQUIPMENTS_DATA, type EquipmentDefinition } from '../data/equipments';
-import { event } from '../lib/gtag';
+import { trackEvent } from '../lib/gtag';
 
 export const Sidebar: React.FC = () => {
   const onDragStart = (eventObj: React.DragEvent<HTMLDivElement>, equipmentData: EquipmentDefinition) => {
     // 分析用イベント送信: ドラッグ開始
-    event({
+    trackEvent({
       action: 'drag_start',
       category: 'interaction',
       label: equipmentData.name,

@@ -27,7 +27,7 @@ import type { EquipmentDefinition } from '../data/equipments';
 import { LearningPopup } from './LearningPopup';
 import { Play, CheckCircle2, AlertCircle, JapaneseYen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { event } from '../lib/gtag';
+import { trackEvent } from '../lib/gtag';
 
 // ノードタイプ定義（コンポーネント外に定義して再生成を防ぐ）
 const nodeTypes = {
@@ -125,7 +125,7 @@ export const NetworkMap: React.FC = () => {
       const targetEq = targetNode.data?.equipment as EquipmentDefinition | undefined;
 
       // 分析用イベント送信: 結線アクション
-      event({
+      trackEvent({
         action: 'network_connect',
         category: 'interaction',
         label: `${sourceEq?.name || 'unknown'} -> ${targetEq?.name || 'unknown'}`,
@@ -198,7 +198,7 @@ export const NetworkMap: React.FC = () => {
       const equipmentData = JSON.parse(raw) as EquipmentDefinition;
 
       // 分析用イベント送信: ドラッグ＆ドロップ（配置）
-      event({
+      trackEvent({
         action: 'drag_and_drop',
         category: 'interaction',
         label: equipmentData.name,
@@ -256,7 +256,7 @@ export const NetworkMap: React.FC = () => {
   // ================================================================
   const runTest = () => {
     // 分析用イベント送信: テスト実行
-    event({
+    trackEvent({
       action: 'run_test',
       category: 'feature',
       label: 'Network Connection Test',
@@ -302,7 +302,7 @@ export const NetworkMap: React.FC = () => {
     const success = reachedOnuIds.length > 0;
 
     // 分析用イベント送信: テスト結果
-    event({
+    trackEvent({
       action: 'test_result',
       category: 'feature',
       label: success ? 'Success' : 'Failure',
@@ -459,7 +459,7 @@ export const NetworkMap: React.FC = () => {
         equipment={activeEquipment}
         onClose={() => {
           if (activeEquipment) {
-            event({
+            trackEvent({
               action: 'close_popup',
               category: 'interaction',
               label: activeEquipment.name,

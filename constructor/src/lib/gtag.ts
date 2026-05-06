@@ -10,7 +10,7 @@ export const pageview = (url: string) => {
 };
 
 // イベントを送信
-export const event = ({ action, category, label, value, ...params }: {
+export const trackEvent = ({ action, category, label, value, ...params }: {
   action: string;
   category?: string;
   label?: string;
