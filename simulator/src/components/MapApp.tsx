@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 import { fetchRoute, generateInfrastructure, calculateCost, getDistance, searchNTTBuildings } from '../logic/infraLogic';
 import type { SimulationResult, NTTBuilding } from '../logic/infraLogic';
+import { event } from '../lib/gtag';
 
 // Leaflet markers
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
@@ -88,6 +89,14 @@ export const MapApp: React.FC = () => {
     setError('');
     setLoadingStep('検索中...');
     
+    // 分析用イベント送信: 住所検索
+    event({
+      action: 'search_jump',
+      category: 'interaction',
+      label: 'Address Search',
+      action_detail: 'map_jump'
+    });
+
     try {
       let geoData: any[] = [];
       let currentQuery = searchQuery;
@@ -123,6 +132,14 @@ export const MapApp: React.FC = () => {
     setPhase('SEARCHING');
     setLoadingStep('局舎を検索中...');
 
+    // 分析用イベント送信: 自宅確定
+    event({
+      action: 'confirm_home',
+      category: 'interaction',
+      label: 'Set Home Location',
+      action_detail: 'home_determined'
+    });
+
     try {
       const buildings = await searchNTTBuildings(mapCenter[0], mapCenter[1]);
 
@@ -156,6 +173,14 @@ export const MapApp: React.FC = () => {
     setPhase('SEARCHING');
     setLoadingStep('経路を算出中...');
 
+    // 分析用イベント送信: 手動局舎確定
+    event({
+      action: 'confirm_ntt_manual',
+      category: 'interaction',
+      label: 'Set NTT Building Manually',
+      action_detail: 'ntt_determined_manual'
+    });
+
     const manualBuilding: NTTBuilding = {
       id: 'manual_' + Date.now(),
       name: '手動指定NTTビル',
@@ -178,14 +203,38 @@ export const MapApp: React.FC = () => {
       const infra = generateInfrastructure(route);
       const cost = calculateCost(infra);
       setResult({ ...infra, building, cost });
+
+      // 分析用イベント送信: シミュレーション成功
+      event({
+        action: 'simulation_success',
+        category: 'feature',
+        label: building.name,
+        value: cost,
+        action_detail: 'simulation_result'
+      });
+
       setPhase('RESULT');
       setJumpCoords(home);
     } catch(err: any) {
+      // 分析用イベント送信: シミュレーション失敗
+      event({
+        action: 'simulation_error',
+        category: 'feature',
+        label: err.message,
+        action_detail: 'simulation_fail'
+      });
       throw new Error(err.message || '経路の取得に失敗しました。');
     }
   };
 
   const handleReset = () => {
+    // 分析用イベント送信: リセット
+    event({
+      action: 'reset_simulator',
+      category: 'interaction',
+      label: 'Restart Simulation',
+      action_detail: 'ui_reset'
+    });
     setResult(null);
     setHomeCoords(null);
     setPhase('SET_HOME');

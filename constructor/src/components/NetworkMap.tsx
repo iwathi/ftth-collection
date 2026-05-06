@@ -27,6 +27,7 @@ import type { EquipmentDefinition } from '../data/equipments';
 import { LearningPopup } from './LearningPopup';
 import { Play, CheckCircle2, AlertCircle, JapaneseYen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { event } from '../lib/gtag';
 
 // ノードタイプ定義（コンポーネント外に定義して再生成を防ぐ）
 const nodeTypes = {
@@ -123,6 +124,15 @@ export const NetworkMap: React.FC = () => {
       const sourceEq = sourceNode.data?.equipment as EquipmentDefinition | undefined;
       const targetEq = targetNode.data?.equipment as EquipmentDefinition | undefined;
 
+      // 分析用イベント送信: 結線アクション
+      event({
+        action: 'network_connect',
+        category: 'interaction',
+        label: `${sourceEq?.name || 'unknown'} -> ${targetEq?.name || 'unknown'}`,
+        item_type: sourceEq?.itemType,
+        action_detail: 'wire_connection'
+      });
+
       let isCorrect = true; // インフラ同士・インフラ-機器間はニュートラル扱い
 
       if (sourceEq && targetEq) {
@@ -187,6 +197,15 @@ export const NetworkMap: React.FC = () => {
 
       const equipmentData = JSON.parse(raw) as EquipmentDefinition;
 
+      // 分析用イベント送信: ドラッグ＆ドロップ（配置）
+      event({
+        action: 'drag_and_drop',
+        category: 'interaction',
+        label: equipmentData.name,
+        item_type: equipmentData.itemType,
+        action_detail: 'place_node'
+      });
+
       const position = reactFlowInstance.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
@@ -236,6 +255,14 @@ export const NetworkMap: React.FC = () => {
   // 開通テスト — BFS で OLT から ONU へのパスが存在するか判定
   // ================================================================
   const runTest = () => {
+    // 分析用イベント送信: テスト実行
+    event({
+      action: 'run_test',
+      category: 'feature',
+      label: 'Network Connection Test',
+      action_detail: 'test_execution'
+    });
+
     // OLTとONUのノードを探す（splitterノードタイプも対象に含める）
     const allEquipNodes = nodes.filter(n =>
       ['equipmentNode', 'splitter8', 'splitter4'].includes(n.type ?? '')
@@ -273,6 +300,15 @@ export const NetworkMap: React.FC = () => {
     // ONUに到達できたか
     const reachedOnuIds = onuNodes.filter(n => visited.has(n.id)).map(n => n.id);
     const success = reachedOnuIds.length > 0;
+
+    // 分析用イベント送信: テスト結果
+    event({
+      action: 'test_result',
+      category: 'feature',
+      label: success ? 'Success' : 'Failure',
+      value: success ? 1 : 0,
+      action_detail: 'test_outcome'
+    });
 
     if (success) {
       // 成功: 到達可能経路のエッジを緑アニメーション、それ以外はグレー
@@ -421,7 +457,17 @@ export const NetworkMap: React.FC = () => {
 
       <LearningPopup
         equipment={activeEquipment}
-        onClose={() => setActiveEquipment(null)}
+        onClose={() => {
+          if (activeEquipment) {
+            event({
+              action: 'close_popup',
+              category: 'interaction',
+              label: activeEquipment.name,
+              action_detail: 'popup_close'
+            });
+          }
+          setActiveEquipment(null);
+        }}
       />
     </div>
   );

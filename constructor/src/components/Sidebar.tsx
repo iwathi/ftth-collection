@@ -1,11 +1,21 @@
 import React from 'react';
 import { EQUIPMENTS_DATA, type EquipmentDefinition } from '../data/equipments';
+import { event } from '../lib/gtag';
 
 export const Sidebar: React.FC = () => {
-  const onDragStart = (event: React.DragEvent<HTMLDivElement>, equipmentData: EquipmentDefinition) => {
+  const onDragStart = (eventObj: React.DragEvent<HTMLDivElement>, equipmentData: EquipmentDefinition) => {
+    // 分析用イベント送信: ドラッグ開始
+    event({
+      action: 'drag_start',
+      category: 'interaction',
+      label: equipmentData.name,
+      item_type: equipmentData.itemType,
+      action_detail: 'inventory_drag'
+    });
+
     // stringified データを付与してドロップ先に渡す
-    event.dataTransfer.setData('application/reactflow', JSON.stringify(equipmentData));
-    event.dataTransfer.effectAllowed = 'move';
+    eventObj.dataTransfer.setData('application/reactflow', JSON.stringify(equipmentData));
+    eventObj.dataTransfer.effectAllowed = 'move';
   };
 
   return (
